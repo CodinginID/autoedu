@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AutoEdu Dasboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-gray-100 flex">
+
+  <!-- Sidebar -->
+  <aside class="w-64 bg-white border-r border-gray-200 h-screen sticky top-0 flex flex-col p-5 shadow-md">
+    <h1 class="text-2xl font-bold text-blue-600 mb-8">AutoEdu Dasboard</h1>
+
+    <nav class="flex-1 space-y-2 text-sm text-gray-700">
+      <a href="/dashboard" class="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100">
+        <i data-lucide="home" class="w-4 h-4"></i> Beranda
+      </a>
+
+      <a href="/dashboard?tambah=true" class="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100">
+        <i data-lucide="plus-square" class="w-4 h-4"></i> Tambah Materi
+      </a>
+    </nav>
+
+    <div class="mt-auto">
+      <a href="/logout" class="flex items-center gap-2 text-red-500 hover:underline text-sm">
+        <i data-lucide="log-out" class="w-4 h-4"></i> Logout
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="flex-1 p-6 overflow-y-auto">
+    {% block content %}{% endblock %}
+  </main>
+
+  <script>lucide.createIcons();</script>
+</body>
+</html>

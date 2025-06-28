@@ -1,0 +1,4 @@
+flask==2.3.2
+pymongo==4.7.0
+werkzeug==3.0.1
+

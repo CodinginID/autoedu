@@ -1,0 +1,54 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="px-6 py-6">
+  <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
+    <i data-lucide="book-open" class="w-6 h-6 text-blue-500"></i>
+    {{ materi.judul }}
+  </h2>
+
+  <p class="text-gray-600 mb-6">{{ materi.deskripsi }}</p>
+
+  <div>
+    <ul class="flex border-b space-x-4" id="tabs">
+      {% for sub in materi.sub_materi %}
+      <li>
+        <button class="py-2 px-4 text-gray-700 hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition" data-tab="tab-{{ loop.index }}">
+          {{ sub.judul }}
+        </button>
+      </li>
+      {% endfor %}
+    </ul>
+
+    <div class="mt-4" id="tab-contents">
+      {% for sub in materi.sub_materi %}
+      <div class="tab-content {% if loop.first %}block{% else %}hidden{% endif %}" id="tab-{{ loop.index }}">
+        <div class="bg-white shadow p-4 rounded-lg">
+          {% if sub.judul|lower == 'apersepsi' and sub.konten.endswith(('.mp4', '.webm')) %}
+            <video controls class="w-full rounded">
+              <source src="{{ url_for('static', filename='uploads/' ~ sub.konten) }}" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          {% else %}
+            <p class="text-gray-700 whitespace-pre-wrap">{{ sub.konten }}</p>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('#tabs button').forEach(tab => {
+    tab.addEventListener('click', function () {
+      const tabId = this.dataset.tab;
+
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.getElementById(tabId).classList.remove('hidden');
+
+      document.querySelectorAll('#tabs button').forEach(btn => btn.classList.remove('border-blue-600', 'text-blue-600'));
+      this.classList.add('border-blue-600', 'text-blue-600');
+    });
+  });
+</script>
+{% endblock %}

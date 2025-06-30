@@ -26,8 +26,7 @@
         <textarea name="deskripsi" id="deskripsi" rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
       </div>
 
-      <div id="subMateriContainer" class="space-y-4">
-        </div>
+      <div id="subMateriContainer" class="space-y-4"></div>
 
       <button type="button" onclick="addSubMateri()" class="bg-green-100 text-green-800 font-medium px-4 py-2 rounded-lg hover:bg-green-200 transition duration-150 ease-in-out flex items-center gap-2">
         <i data-lucide="plus" class="w-4 h-4"></i>
@@ -65,22 +64,16 @@ function addSubMateri() {
       </select>
     </div>
 
-    <div class="konten-input" id="konten-input-${subMateriIndex}">
-      <textarea name="submateri[${subMateriIndex}][konten]" rows="3" class="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Isi konten teks..."></textarea>
-    </div>
+    <div class="konten-input" id="konten-input-${subMateriIndex}"></div>
   `;
   container.appendChild(div);
-
-  // Inisialisasi konten default (teks) dan render ikon lucide jika ada
-  const selectElement = div.querySelector(`select[name="submateri[${subMateriIndex}][tipe]"]`);
-  handleKontenTypeChange(selectElement, subMateriIndex);
-  
+  handleKontenTypeChange(div.querySelector('select'), subMateriIndex);
   subMateriIndex++;
 }
 
 function handleKontenTypeChange(select, index) {
   const wrapper = document.getElementById(`konten-input-${index}`);
-  wrapper.innerHTML = ''; // Kosongkan konten sebelumnya
+  wrapper.innerHTML = '';
   const val = select.value;
 
   if (val === 'text') {
@@ -88,17 +81,15 @@ function handleKontenTypeChange(select, index) {
       <textarea name="submateri[${index}][konten]" rows="3" class="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Isi konten teks..."></textarea>
     `;
   } else if (val === 'video') {
-    const uniqueId = `upload-video-${index}`;
     wrapper.innerHTML = `
       <div class="relative w-full">
-        <label for="${uniqueId}" class="flex items-center justify-center gap-3 border border-dashed border-blue-400 p-4 rounded-lg bg-blue-50 cursor-pointer hover:bg-blue-100 transition duration-150 ease-in-out">
+        <label for="upload-video-${index}" class="flex items-center justify-center gap-3 border border-dashed border-blue-400 p-4 rounded-lg bg-blue-50 cursor-pointer hover:bg-blue-100 transition duration-150 ease-in-out">
           <i data-lucide="upload-cloud" class="w-6 h-6 text-blue-500"></i>
           <span class="text-base text-blue-700 font-medium">Unggah Video</span>
         </label>
-        <input id="${uniqueId}" type="file" name="submateri[${index}][video]" accept="video/*" class="sr-only">
+        <input id="upload-video-${index}" type="file" name="submateri[${index}][video]" accept="video/*" class="sr-only">
       </div>
     `;
-    // Panggil lucide.createIcons() setelah elemen baru ditambahkan ke DOM
     lucide.createIcons();
   } else if (val === 'multi') {
     wrapper.innerHTML = `
@@ -108,7 +99,7 @@ function handleKontenTypeChange(select, index) {
         Tambah Sub-submateri
       </button>
     `;
-    lucide.createIcons(); // Memastikan ikon plus muncul untuk tambah sub-submateri
+    lucide.createIcons();
   }
 }
 
@@ -119,12 +110,47 @@ function addSubSub(index) {
   div.className = "border border-gray-200 p-3 rounded-lg bg-gray-50";
   div.innerHTML = `
     <input name="submateri[${index}][subs][${count}][judul]" placeholder="Judul Sub-submateri" class="w-full mb-2 border border-gray-300 px-2 py-1 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500">
-    <textarea name="submateri[${index}][subs][${count}][konten]" placeholder="Konten Sub-submateri" class="w-full border border-gray-300 px-2 py-1 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500"></textarea>
+
+    <select name="submateri[${index}][subs][${count}][tipe]" onchange="handleSubSubTipeChange(this, ${index}, ${count})" class="w-full mb-2 border border-gray-300 px-2 py-1 rounded-lg text-sm">
+      <option value="text">Teks</option>
+      <option value="video">Video</option>
+      <option value="image">Gambar</option>
+    </select>
+
+    <div class="subsub-konten" id="subsub-konten-${index}-${count}">
+      <textarea name="submateri[${index}][subs][${count}][konten]" placeholder="Konten Sub-submateri" class="w-full border border-gray-300 px-2 py-1 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500"></textarea>
+    </div>
   `;
   container.appendChild(div);
 }
 
-// Pastikan Lucide diinisialisasi saat DOM siap
+function handleSubSubTipeChange(select, parentIndex, subIndex) {
+  const wrapper = document.getElementById(`subsub-konten-${parentIndex}-${subIndex}`);
+  wrapper.innerHTML = '';
+  const val = select.value;
+
+  if (val === 'text') {
+    wrapper.innerHTML = `<textarea name="submateri[${parentIndex}][subs][${subIndex}][konten]" class="w-full border border-gray-300 px-2 py-1 rounded-lg text-sm" placeholder="Konten teks..."></textarea>`;
+  } else if (val === 'video') {
+    wrapper.innerHTML = `
+      <label class="flex items-center justify-center gap-2 border border-dashed border-blue-400 p-3 rounded bg-blue-50 cursor-pointer">
+        <i data-lucide="upload" class="w-4 h-4 text-blue-500"></i>
+        <span class="text-blue-700 text-sm">Unggah Video</span>
+        <input type="file" name="submateri[${parentIndex}][subs][${subIndex}][konten]" accept="video/*" class="hidden">
+      </label>
+    `;
+  } else if (val === 'image') {
+    wrapper.innerHTML = `
+      <label class="flex items-center justify-center gap-2 border border-dashed border-green-400 p-3 rounded bg-green-50 cursor-pointer">
+        <i data-lucide="image" class="w-4 h-4 text-green-500"></i>
+        <span class="text-green-700 text-sm">Unggah Gambar</span>
+        <input type="file" name="submateri[${parentIndex}][subs][${subIndex}][konten]" accept="image/*" class="hidden">
+      </label>
+    `;
+  }
+  lucide.createIcons();
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   lucide.createIcons();
 });

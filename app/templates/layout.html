@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AutoEdu Dasboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
+
 <body class="bg-gray-100 flex">
 
   <!-- Sidebar -->
@@ -24,6 +26,10 @@
     </nav>
 
     <div class="mt-auto">
+      <a href="{{ url_for('tentang_saya') }}" class="flex items-center gap-2 text-black-500 hover:underline text-sm">
+        <i data-lucide="user" class="w-4 h-4"></i>
+        Tentang Saya
+      </a>
       <a href="/logout" class="flex items-center gap-2 text-red-500 hover:underline text-sm">
         <i data-lucide="log-out" class="w-4 h-4"></i> Logout
       </a>
@@ -37,4 +43,5 @@
 
   <script>lucide.createIcons();</script>
 </body>
+
 </html>

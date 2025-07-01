@@ -27,6 +27,8 @@ materi_collection = db["materi"]
 user_collection = db["users"]
 mongo_crud.create_one(user_collection, {"username": "admin", "password": "admin"})
 
+# In-memory database dummy
+materi_list = []
 
 @app.route('/')
 def index():
@@ -146,55 +148,58 @@ def dashboard():
         return redirect(url_for('login'))
 
     if request.method == 'POST':
-        judul = request.form.get('judul')
-        deskripsi = request.form.get('deskripsi')
+        tambah_materi()
+        # judul = request.form.get('judul')
+        # deskripsi = request.form.get('deskripsi')
 
-        submateri_list = []
-        index = 0
-        while True:
-            prefix = f"submateri[{index}]"
-            if f"{prefix}[judul]" not in request.form:
-                break
+        # submateri_list = []
+        # index = 0
+        # while True:
+        #     prefix = f"submateri[{index}]"
+        #     if f"{prefix}[judul]" not in request.form:
+        #         break
 
-            judul_sub = request.form.get(f"{prefix}[judul]")
-            tipe = request.form.get(f"{prefix}[tipe]")
+        #     judul_sub = request.form.get(f"{prefix}[judul]")
+        #     tipe = request.form.get(f"{prefix}[tipe]")
 
-            sub_obj = {"judul": judul_sub, "tipe": tipe}
+        #     sub_obj = {"judul": judul_sub, "tipe": tipe}
 
-            if tipe == "text":
-                sub_obj["konten"] = request.form.get(f"{prefix}[konten]")
-            elif tipe == "video":
-                video_file = request.files.get(f"{prefix}[video]")
-                if video_file:
-                    filename = secure_filename(video_file.filename)
-                    video_path = os.path.join('static/uploads', filename)
-                    video_file.save(video_path)
-                    sub_obj["konten"] = filename
-            elif tipe == "multi":
-                subs = []
-                subindex = 0
-                while True:
-                    subjudul_key = f"{prefix}[subs][{subindex}][judul]"
-                    subkonten_key = f"{prefix}[subs][{subindex}][konten]"
-                    if subjudul_key not in request.form:
-                        break
-                    subs.append({
-                        "judul": request.form.get(subjudul_key),
-                        "konten": request.form.get(subkonten_key)
-                    })
-                    subindex += 1
-                sub_obj["konten"] = subs
+        #     if tipe == "text":
+        #         sub_obj["konten"] = request.form.get(f"{prefix}[konten]")
+        #     elif tipe == "video":
+        #         video_file = request.files.get(f"{prefix}[video]")
+        #         if video_file:
+        #             filename = secure_filename(video_file.filename)
+        #             video_path = os.path.join('static/uploads', filename)
+        #             video_file.save(video_path)
+        #             sub_obj["konten"] = filename
+        #     elif tipe == "multi":
+        #         subs = []
+        #         subindex = 0
+        #         while True:
+        #             subjudul_key = f"{prefix}[subs][{subindex}][judul]"
+        #             subkonten_key = f"{prefix}[subs][{subindex}][konten]"
+        #             if subjudul_key not in request.form:
+        #                 break
+        #             subs.append({
+        #                 "judul": request.form.get(subjudul_key),
+        #                 "konten": request.form.get(subkonten_key)
+        #             })
+        #             subindex += 1
+        #         sub_obj["konten"] = subs
 
-            submateri_list.append(sub_obj)
-            index += 1
+        #     submateri_list.append(sub_obj)
+        #     index += 1
 
-        # Simpan ke database
-        materi_collection.insert_one({
-            "id": materi_collection.count_documents({}) + 1,
-            "judul": judul,
-            "deskripsi": deskripsi,
-            "sub_materi": submateri_list
-        })
+        # # Simpan ke database
+        # materi_collection.insert_one({
+        #     "id": materi_collection.count_documents({}) + 1,
+        #     "judul": judul,
+        #     "deskripsi": deskripsi,
+        #     "sub_materi": submateri_list
+        # })
+
+        print("ini yang jalan")
 
         return redirect(url_for('dashboard'))
 
@@ -211,28 +216,103 @@ def dashboard():
 
 @app.route('/materi/tambah', methods=['GET', 'POST'])
 def tambah_materi():
-    if 'username' not in session:
-        return redirect(url_for('login'))
-
     if request.method == 'POST':
-        judul = request.form['judul']
-        deskripsi = request.form['deskripsi']
-        icon_url = request.form['icon_url']
+        # Ambil data utama
+        judul = request.form.get('judul')
+        deskripsi = request.form.get('deskripsi')
 
-        # Ambil ID terakhir, lalu tambah 1
-        last = materi_collection.find_one(sort=[("id", -1)])
-        new_id = (last['id'] + 1) if last else 1
+        submateri_list = []
+        i = 0
+        while True:
+            judul_sub = request.form.get(f"submateri[{i}][judul]")
+            if not judul_sub:
+                break
 
+            tipe_sub = request.form.get(f"submateri[{i}][tipe]")
+            sub_data = {"judul": judul_sub, "tipe": tipe_sub}
+
+            if tipe_sub == "text":
+                sub_data["konten"] = request.form.get(f"submateri[{i}][konten]")
+
+            elif tipe_sub == "video":
+                video = request.files.get(f"submateri[{i}][video]")
+                if video and video.filename:
+                    filename = secure_filename(video.filename)
+                    video.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                    sub_data["konten"] = filename
+                else:
+                    sub_data["konten"] = None
+
+            elif tipe_sub == "multi":
+                sub_data["konten"] = []
+                j = 0
+                while True:
+                    subjudul = request.form.get(f"submateri[{i}][subs][{j}][judul]")
+                    if not subjudul:
+                        break
+
+                    tipe = request.form.get(f"submateri[{i}][subs][{j}][tipe]")
+                    subsub = {"judul": subjudul, "tipe": tipe}
+
+                    if tipe == "text":
+                        subsub["konten"] = request.form.get(f"submateri[{i}][subs][{j}][konten]")
+
+                    elif tipe in ("video", "image"):
+                        file = request.files.get(f"submateri[{i}][subs][{j}][konten]")
+                        if file and file.filename:
+                            filename = secure_filename(file.filename)
+                            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                            subsub["konten"] = filename
+                        else:
+                            subsub["konten"] = None
+
+                    sub_data["konten"].append(subsub)
+                    j += 1
+
+            submateri_list.append(sub_data)
+            i += 1
+
+        # Simpan ke MongoDB
         materi_collection.insert_one({
-            "id": new_id,
+            "id": materi_collection.count_documents({}) + 1,
             "judul": judul,
             "deskripsi": deskripsi,
-            "icon_url": icon_url
+            "sub_materi": submateri_list
         })
+
+        print("harusnya ini yang jalan")
 
         return redirect(url_for('dashboard'))
 
-    return render_template("tambah_materi.html")
+# @app.route('/materi/tambah', methods=['GET', 'POST'])
+# def tambah_materi():
+#     if 'username' not in session:
+#         return redirect(url_for('login'))
+
+#     if request.method == 'POST':
+#         judul = request.form['judul']
+#         deskripsi = request.form['deskripsi']
+#         icon_url = request.form['icon_url']
+
+#         # Ambil ID terakhir, lalu tambah 1
+#         last = materi_collection.find_one(sort=[("id", -1)])
+#         new_id = (last['id'] + 1) if last else 1
+
+#         materi_collection.insert_one({
+#             "id": new_id,
+#             "judul": judul,
+#             "deskripsi": deskripsi,
+#             "icon_url": icon_url
+#         })
+
+#         return redirect(url_for('dashboard'))
+
+#     return render_template("tambah_materi.html")
 
 
-
+def save_file(file):
+    ext = os.path.splitext(file.filename)[1]
+    filename = f"{uuid.uuid4().hex}{ext}"
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    file.save(filepath)
+    return filename

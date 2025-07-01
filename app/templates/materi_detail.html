@@ -11,74 +11,87 @@
   <div class="border-b border-gray-200 mb-4">
     <nav class="flex space-x-6">
       {% for sub in materi.sub_materi %}
-        {% set sub_index = loop.index0 %}
-        <button class="py-2 text-sm font-medium text-gray-600 hover:text-blue-600 border-b-2 transition-all"
-          onclick="showSub('{{ sub_index }}')" id="tab-btn-{{ sub_index }}">
-          {{ sub.judul }}
-        </button>
+      {% set sub_index = loop.index0 %}
+      <button class="py-2 text-sm font-medium text-gray-600 hover:text-blue-600 border-b-2 transition-all"
+        onclick="showSub('{{ sub_index }}')" id="tab-btn-{{ sub_index }}">
+        {{ sub.judul }}
+      </button>
       {% endfor %}
     </nav>
   </div>
 
   {% for sub in materi.sub_materi %}
-    {% set sub_index = loop.index0 %}
-    <div id="tab-content-{{ sub_index }}" class="tab-content hidden">
-      {% if sub.tipe == 'video' %}
-        <video controls class="rounded shadow w-full">
-          <source src="{{ url_for('static', filename='uploads/' ~ sub.konten) }}" type="video/mp4">
-          Browser tidak mendukung video.
-        </video>
+  {% set sub_index = loop.index0 %}
+  <div id="tab-content-{{ sub_index }}" class="tab-content hidden">
+    {% if sub.tipe == 'video' %}
+    <video controls class="rounded shadow w-full">
+      <source src="{{ url_for('static', filename='uploads/' ~ sub.konten) }}" type="video/mp4">
+      Browser tidak mendukung video.
+    </video>
 
-      {% elif sub.tipe == 'text' %}
-        <div class="p-4 bg-white rounded shadow">{{ sub.konten }}</div>
+    {% elif sub.tipe == 'text' %}
+    <div class="p-4 bg-white rounded shadow">{{ sub.konten }}</div>
 
-      {% elif sub.tipe == 'multi' %}
-        <div class="flex gap-4">
-          <div class="w-1/4 space-y-2">
-            {% for child in sub.konten %}
-              {% set subs_index = loop.index0 %}
-              <button class="block w-full text-left px-4 py-2 rounded bg-gray-100 hover:bg-blue-100 text-gray-800"
-                onclick="showSubSub('{{ sub_index }}', '{{ subs_index }}')"
-                id="sub-btn-{{ sub_index }}-{{ subs_index }}">
-                {{ child.judul }}
-              </button>
-            {% endfor %}
-          </div>
-          <div class="w-3/4">
-            {% for child in sub.konten %}
-              {% set subs_index = loop.index0 %}
-              <div class="hidden sub-sub" id="sub-content-{{ sub_index }}-{{ subs_index }}">
-                <div class="bg-white p-4 rounded shadow">
-                  <!-- <h4 class="font-semibold text-gray-700">{{ child.judul }}</h4> -->
-                  <p class="text-gray-600">{{ child.konten }}</p>
-                </div>
-              </div>
-            {% endfor %}
+    {% elif sub.tipe == 'multi' %}
+    <div class="flex gap-4">
+      <div class="w-1/4 space-y-2">
+        {% for child in sub.konten %}
+        {% set subs_index = loop.index0 %}
+        <button class="block w-full text-left px-4 py-2 rounded bg-gray-100 hover:bg-blue-100 text-gray-800"
+          onclick="showSubSub('{{ sub_index }}', '{{ subs_index }}')" id="sub-btn-{{ sub_index }}-{{ subs_index }}">
+          {{ child.judul }}
+        </button>
+        {% endfor %}
+      </div>
+
+      <div class="w-3/4">
+        {% for child in sub.konten %}
+        {% set subs_index = loop.index0 %}
+        <div class="hidden sub-sub" id="sub-content-{{ sub_index }}-{{ subs_index }}">
+          <div class="bg-white p-4 rounded shadow">
+            <h4 class="font-semibold text-gray-700">{{ child.judul }}</h4>
+
+            {% if child.tipe == 'text' %}
+            <p class="text-gray-600">{{ child.konten }}</p>
+            {% elif child.tipe == 'video' %}
+            <video controls class="w-full rounded shadow">
+              <source src="{{ url_for('static', filename='uploads/' ~ child.konten) }}" type="video/mp4">
+              Browser tidak mendukung video.
+            </video>
+            {% elif child.tipe == 'image' %}
+            <img src="{{ url_for('static', filename='uploads/' ~ child.konten) }}" alt="{{ child.judul }}"
+              class="w-full rounded shadow">
+            {% else %}
+            <p class="text-red-500">Tipe konten tidak dikenali</p>
+            {% endif %}
           </div>
         </div>
-      {% endif %}
+        {% endfor %}
+      </div>
     </div>
+    {% endif %}
+  </div>
   {% endfor %}
 </div>
 
 <script>
-function showSub(idx) {
-  document.querySelectorAll('.tab-content').forEach(e => e.classList.add('hidden'));
-  document.getElementById(`tab-content-${idx}`).classList.remove('hidden');
+  function showSub(idx) {
+    document.querySelectorAll('.tab-content').forEach(e => e.classList.add('hidden'));
+    document.getElementById(`tab-content-${idx}`).classList.remove('hidden');
 
-  document.querySelectorAll('[id^="tab-btn-"]').forEach(btn => btn.classList.remove('border-blue-600', 'text-blue-600'));
-  document.getElementById(`tab-btn-${idx}`).classList.add('border-blue-600', 'text-blue-600');
-}
+    document.querySelectorAll('[id^="tab-btn-"]').forEach(btn => btn.classList.remove('border-blue-600', 'text-blue-600'));
+    document.getElementById(`tab-btn-${idx}`).classList.add('border-blue-600', 'text-blue-600');
+  }
 
-function showSubSub(parentIdx, childIdx) {
-  document.querySelectorAll(`#tab-content-${parentIdx} .sub-sub`).forEach(e => e.classList.add('hidden'));
-  document.getElementById(`sub-content-${parentIdx}-${childIdx}`).classList.remove('hidden');
+  function showSubSub(parentIdx, childIdx) {
+    document.querySelectorAll(`#tab-content-${parentIdx} .sub-sub`).forEach(e => e.classList.add('hidden'));
+    document.getElementById(`sub-content-${parentIdx}-${childIdx}`).classList.remove('hidden');
 
-  document.querySelectorAll(`[id^="sub-btn-${parentIdx}-"]`).forEach(btn => btn.classList.remove('bg-blue-100'));
-  document.getElementById(`sub-btn-${parentIdx}-${childIdx}`).classList.add('bg-blue-100');
-}
+    document.querySelectorAll(`[id^="sub-btn-${parentIdx}-"]`).forEach(btn => btn.classList.remove('bg-blue-100'));
+    document.getElementById(`sub-btn-${parentIdx}-${childIdx}`).classList.add('bg-blue-100');
+  }
 
-// Show first tab by default
-showSub(0);
+  // Show first tab by default
+  showSub(0);
 </script>
 {% endblock %}

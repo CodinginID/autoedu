@@ -316,3 +316,12 @@ def save_file(file):
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     file.save(filepath)
     return filename
+
+
+@app.route('/tentang-saya')
+def tentang_saya():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    user = session['username']  # Pastikan ini sudah tersimpan saat login
+    return render_template('tentang_saya.html', user=user)

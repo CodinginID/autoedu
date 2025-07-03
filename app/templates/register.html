@@ -1,57 +1,80 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Daftar Akun - TKR</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daftar Akun - AutoEdu</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 </head>
+
 <body class="min-h-screen flex items-center justify-center bg-gray-100">
 
   <div class="w-full max-w-md p-8 bg-white rounded-3xl shadow-lg" x-data="{ username: '' }">
-    
+
     <!-- LOGO -->
     <div class="flex justify-center mb-6">
-      <img src="https://cdn-icons-png.flaticon.com/512/2942/2942601.png" alt="Logo TKR" class="h-16 w-16">
+      <img src="{{ url_for('static', filename='image/machine_icon.png') }}" alt="Logo AutoEdu" class="h-16 w-16">
     </div>
 
     <!-- TITLE -->
-    <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Daftar Akun Baru</h2>
+    <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Register New Account</h2>
 
     <!-- FORM -->
     <form method="POST" class="space-y-4">
       {% if error %}
-        <div class="bg-red-100 text-red-600 p-2 rounded-md text-sm">
-          {{ error }}
-        </div>
+      <div class="bg-red-100 text-red-600 p-2 rounded-md text-sm">
+        {{ error }}
+      </div>
       {% endif %}
 
       <!-- Username -->
       <div>
-        <input type="text" name="username" placeholder="Username" required
-               x-model="username"
-               class="w-full px-4 py-3 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <input type="text" name="username" placeholder="Username" required x-model="username"
+          class="w-full px-4 py-3 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500">
       </div>
 
       <!-- Password -->
-      <div x-show="username.trim() !== ''" x-transition>
-        <input type="password" name="password" placeholder="Password" required
-               class="w-full px-4 py-3 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500">
+      <div x-show="username.trim() !== ''" x-transition x-data="{ showPassword: false }">
+        <div class="relative">
+          <input :type="showPassword ? 'text' : 'password'" name="password" placeholder="Password" required
+            class="w-full px-4 py-3 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 pr-12">
+
+          <!-- Lucide eye icon toggle -->
+          <button type="button" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+            @click="showPassword = !showPassword">
+            <i :data-lucide="showPassword ? 'eye-off' : 'eye'" class="w-5 h-5"></i>
+          </button>
+        </div>
       </div>
 
       <!-- Submit -->
-      <button type="submit"
-              class="w-full bg-green-600 text-white py-3 rounded-2xl hover:bg-green-700 transition mt-2">
-        Daftar
+      <button type="submit" class="w-full bg-green-600 text-white py-3 rounded-2xl hover:bg-green-700 transition mt-2">
+        Register
       </button>
     </form>
 
     <!-- Footer -->
     <p class="mt-4 text-sm text-center text-gray-600">
-      Sudah punya akun?
+      Already have an account?
       <a href="/login" class="text-blue-600 hover:underline">Login</a>
     </p>
   </div>
+
+  <script>
+    document.addEventListener('alpine:init', () => {
+      Alpine.effect(() => {
+        lucide.createIcons();
+      });
+    });
+
+    // Inisialisasi awal
+    document.addEventListener("DOMContentLoaded", function () {
+      lucide.createIcons();
+    });
+  </script>
+  <script src="https://unpkg.com/lucide@latest"></script>
 </body>
+
 </html>

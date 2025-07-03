@@ -1,3 +1,6 @@
+# clear screeen
+clear
+
 #!/bin/bash
 
 # Aktifkan virtual environment jika menggunakan venv (opsional)

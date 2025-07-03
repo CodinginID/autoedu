@@ -1,5 +1,5 @@
 from mimetypes import init
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from pymongo import MongoClient
@@ -23,9 +23,8 @@ def allowed_file(filename):
 client = MongoClient("mongodb://admin:admin123@localhost:27017/tkr?authSource=admin")
 db = client["tkr"]
 materi_collection = db["materi"]
-
 user_collection = db["users"]
-mongo_crud.create_one(user_collection, {"username": "admin", "password": "admin"})
+# mongo_crud.create_one(user_collection, {"username": "admin", "password": "admin"})
 
 # In-memory database dummy
 materi_list = []
@@ -42,15 +41,14 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-
-        print(username, password)
-
         user = user_collection.find_one({'username': username})
         if user and check_password_hash(user['password'], password):
             session['username'] = username
-            return redirect(url_for('index'))
+            flash('Berhasil login!', 'success')
+            return redirect(url_for('dashboard'))
         else:
-            return render_template('login.html', error='Login gagal')
+            flash('Username atau password salah', 'error')
+            return render_template('login.html')
 
     return render_template('login.html')
 
@@ -86,6 +84,7 @@ def register():
 
         hashed_pw = generate_password_hash(password)
         user_collection.insert_one({'username': username, 'password': hashed_pw})
+        flash("Registrasi berhasil! Silakan login.", "success")
         return redirect(url_for('login'))
 
     return render_template('register.html')
@@ -199,7 +198,6 @@ def dashboard():
         #     "sub_materi": submateri_list
         # })
 
-        print("ini yang jalan")
 
         return redirect(url_for('dashboard'))
 
@@ -279,8 +277,6 @@ def tambah_materi():
             "deskripsi": deskripsi,
             "sub_materi": submateri_list
         })
-
-        print("harusnya ini yang jalan")
 
         return redirect(url_for('dashboard'))
 

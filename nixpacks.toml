@@ -1,10 +1,15 @@
-app_dir = "app"
+nixpacks.app_dir = "app"
 
 [phases.setup]
-nixpkgs = ["python311"]
+nixpacks.pkgs = ["python3", "pip"]
 
 [phases.build]
-commands = ["python3 -m pip install --upgrade pip", "pip install -r requirements.txt"]
+commands = [
+  "pip install --upgrade pip",
+  "pip install -r requirements.txt"
+]
 
 [start]
 cmd = "gunicorn main:app"
+
+# Tentukan direktori aplikasi

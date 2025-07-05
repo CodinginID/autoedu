@@ -1,0 +1,11 @@
+[phases.setup]
+nixpacks.pkgs = ["python3"]
+
+[phases.build]
+commands = ["pip install -r requirements.txt"]
+
+[start]
+cmd = "gunicorn main:app"
+
+# Baris ini penting jika aplikasi Anda berada di dalam subdirektori "app"
+nixpacks.app_dir = "app"

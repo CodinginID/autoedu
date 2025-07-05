@@ -1,6 +1,8 @@
+# Tentukan direktori aplikasi
 nixpacks.app_dir = "app"
 
 [phases.setup]
+nixpacks.base_image = "python:3.9-slim"
 nixpacks.pkgs = ["python3", "pip"]
 
 [phases.build]
@@ -11,5 +13,3 @@ commands = [
 
 [start]
 cmd = "gunicorn main:app"
-
-# Tentukan direktori aplikasi

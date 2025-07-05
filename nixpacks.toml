@@ -1,10 +1,11 @@
 [phases.setup]
 nixpacks.base_image = "python:3.9-slim"
-nixpacks.pkgs = ["python3", "pip"]
+nixpacks.pkgs = ["python3", "python3-pip"]
 
 [phases.build]
 commands = [
-  "pip install --upgrade pip",
+  "python3 -m ensurepip --upgrade",
+  "python3 -m pip install --upgrade pip",
   "pip install -r requirements.txt"
 ]
 

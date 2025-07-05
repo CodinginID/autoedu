@@ -4,7 +4,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from pymongo import MongoClient
 from datastore import mongo_crud
+from dotenv import load_dotenv
 import os
+
+load_dotenv()
 
 
 UPLOAD_FOLDER = 'static/uploads'
@@ -20,11 +23,15 @@ def allowed_file(filename):
 
 
 # Koneksi MongoDB
-client = MongoClient("mongodb://admin:admin123@localhost:27017/tkr?authSource=admin")
+
+dsn = f"{os.getenv('MONGO_PUBLIC_URL')}?authSource=admin"
+if dsn == None:
+    raise Exception("MONGO_PUBLIC_URL not found in .env file")
+
+client = MongoClient(dsn)
 db = client["tkr"]
 materi_collection = db["materi"]
 user_collection = db["users"]
-# mongo_crud.create_one(user_collection, {"username": "admin", "password": "admin"})
 
 # In-memory database dummy
 materi_list = []
@@ -56,6 +63,7 @@ def login():
 @app.route('/logout')
 def logout():
     session.pop('username', None)
+    flash('Berhasil logout!', 'success')
     return redirect(url_for('login'))
 
 @app.route('/materi/<int:materi_id>')

@@ -4,9 +4,9 @@ nixpacks.pkgs = ["python3", "python3-pip"]
 
 [phases.build]
 commands = [
-  "/usr/local/bin/python3 -m ensurepip --upgrade",
-  "/usr/local/bin/python3 -m pip install --upgrade pip",
-  "/usr/local/bin/pip3 install -r requirements.txt"
+  "python -m ensurepip --upgrade",
+  "python -m pip install --upgrade pip",
+  "pip install -r requirements.txt"
 ]
 
 [start]

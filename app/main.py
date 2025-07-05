@@ -321,3 +321,8 @@ def tentang_saya():
 
     user = session['username']  # Pastikan ini sudah tersimpan saat login
     return render_template('tentang_saya.html', user=user)
+
+
+if __name__ == "__main__" :
+    port = int(os.environ.get('PORT', 5000))
+    app.run(debug=False, host='0.0.0.0', port=port)

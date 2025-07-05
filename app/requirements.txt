@@ -6,8 +6,6 @@ click==8.1.7
 dnspython==2.6.1
 email_validator==2.1.1
 exceptiongroup==1.2.1
-fastapi==0.111.0
-fastapi-cli==0.0.3
 Flask==2.3.2
 gunicorn==23.0.0
 h11==0.14.0

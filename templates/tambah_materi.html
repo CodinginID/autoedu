@@ -48,8 +48,13 @@ let subMateriIndex = 0;
 function addSubMateri() {
   const container = document.getElementById('subMateriContainer');
   const div = document.createElement('div');
-  div.className = "border border-gray-300 p-4 rounded-lg bg-white shadow-sm";
+  div.className = "border border-gray-300 p-4 rounded-lg bg-white shadow-sm relative";
+
   div.innerHTML = `
+    <button type="button" class="absolute top-2 right-2 text-red-500 hover:text-red-700" onclick="this.parentElement.remove()">
+      <i data-lucide="x-circle" class="w-5 h-5"></i>
+    </button>
+
     <div class="mb-3">
       <label class="block text-sm font-semibold text-gray-700 mb-1">Judul Sub Materi</label>
       <input name="submateri[${subMateriIndex}][judul]" type="text" class="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-blue-500 focus:border-blue-500">
@@ -68,8 +73,10 @@ function addSubMateri() {
   `;
   container.appendChild(div);
   handleKontenTypeChange(div.querySelector('select'), subMateriIndex);
+  lucide.createIcons();
   subMateriIndex++;
 }
+
 
 function handleKontenTypeChange(select, index) {
   const wrapper = document.getElementById(`konten-input-${index}`);
@@ -107,8 +114,13 @@ function addSubSub(index) {
   const container = document.getElementById(`subsubmateri-${index}`);
   const count = container.childElementCount;
   const div = document.createElement('div');
-  div.className = "border border-gray-200 p-3 rounded-lg bg-gray-50";
+  div.className = "border border-gray-200 p-3 rounded-lg bg-gray-50 relative";
+
   div.innerHTML = `
+    <button type="button" class="absolute top-1 right-1 text-red-500 hover:text-red-700" onclick="this.parentElement.remove()">
+      <i data-lucide="x-circle" class="w-4 h-4"></i>
+    </button>
+
     <input name="submateri[${index}][subs][${count}][judul]" placeholder="Judul Sub-submateri" class="w-full mb-2 border border-gray-300 px-2 py-1 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500">
 
     <select name="submateri[${index}][subs][${count}][tipe]" onchange="handleSubSubTipeChange(this, ${index}, ${count})" class="w-full mb-2 border border-gray-300 px-2 py-1 rounded-lg text-sm">
@@ -122,7 +134,9 @@ function addSubSub(index) {
     </div>
   `;
   container.appendChild(div);
+  lucide.createIcons();
 }
+
 
 function handleSubSubTipeChange(select, parentIndex, subIndex) {
   const wrapper = document.getElementById(`subsub-konten-${parentIndex}-${subIndex}`);

@@ -13,7 +13,7 @@ load_dotenv()
 UPLOAD_FOLDER = 'static/uploads'
 ALLOWED_EXTENSIONS = {'mp4', 'mov', 'avi', 'mkv'}
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="static", template_folder="templates")
 app.secret_key = 'tkr-super-secret'
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER

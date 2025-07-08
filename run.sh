@@ -13,4 +13,4 @@ export FLASK_ENV=development
 export FLASK_DEBUG=1
 
 # Jalankan Flask dengan hot reload
-flask run --host=0.0.0.0 --port=5000 --reload
+flask run --host=0.0.0.0 --port=8008 --reload

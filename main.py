@@ -24,9 +24,10 @@ def allowed_file(filename):
 
 # Koneksi MongoDB
 
-dsn = f"{os.getenv('MONGO_URL')}?authSource=admin"
+dsn = f"{os.getenv('MONGO_PUBLIC_URL')}?authSource=admin"
+print(dsn)
 if dsn == None:
-    raise Exception("MONGO_URL not found in .env file")
+    raise Exception("MONGO_PUBLIC_URL not found in .env file")
 
 client = MongoClient(dsn)
 db = client["tkr"]

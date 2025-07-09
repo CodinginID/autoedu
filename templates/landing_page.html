@@ -1,0 +1,78 @@
+{% extends 'layout_landing_page.html' %}
+
+{% block title %}AutoEdu – Learn Smarter{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<section id="hero" class="min-h-screen bg-gradient-to-b from-blue-100 to-white flex flex-col justify-center items-center text-center px-6">
+  <h1 class="text-5xl md:text-6xl font-extrabold mb-4 text-gray-900">Empower Your Learning</h1>
+  <p class="text-xl text-gray-700 mb-8 max-w-2xl">Interactive starter system automotive education anytime, anywhere.</p>
+  <div class="space-x-4">
+    <a href="#features" class="bg-blue-600 text-white px-6 py-3 rounded-full hover:bg-blue-700 transition">Explore Features</a>
+    <a href="/register" class="bg-white border border-blue-600 text-blue-600 px-6 py-3 rounded-full hover:bg-blue-50 transition">Get Started</a>
+  </div>
+</section>
+
+<!-- Features -->
+<section id="features" class="py-20 bg-white">
+  <div class="max-w-5xl mx-auto px-6 text-center">
+    <h2 class="text-3xl font-bold mb-4">Why Choose AutoEdu?</h2>
+    <p class="text-gray-600 mb-12">Designed for modern, flexible learning experiences.</p>
+    <div class="grid md:grid-cols-3 gap-8">
+      <div class="p-6 border rounded-lg hover:shadow-lg transition text-center">
+        <div class="text-4xl mb-4">📘</div>
+        <h3 class="text-xl font-semibold mb-2">Interactive Lessons</h3>
+        <p class="text-gray-600">Text, videos, visuals – all in one place.</p>
+      </div>
+      <div class="p-6 border rounded-lg hover:shadow-lg transition text-center">
+        <div class="text-4xl mb-4">📈</div>
+        <h3 class="text-xl font-semibold mb-2">Progress Tracking</h3>
+        <p class="text-gray-600">Keep track of your achievements.</p>
+      </div>
+      <div class="p-6 border rounded-lg hover:shadow-lg transition text-center">
+        <div class="text-4xl mb-4">⚙️</div>
+        <h3 class="text-xl font-semibold mb-2">Custom Curriculum</h3>
+        <p class="text-gray-600">Stay flexible with your own learning path.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How It Works -->
+<section id="how-it-works" class="py-20 bg-gradient-to-b from-white to-blue-50">
+  <div class="max-w-4xl mx-auto px-6 text-center">
+    <h2 class="text-3xl font-bold mb-6">How AutoEdu Works</h2>
+    <div class="grid md:grid-cols-3 gap-8">
+      <div class="p-6">
+        <span class="inline-block bg-blue-600 text-white rounded-full h-12 w-12 flex items-center justify-center text-lg mb-4">1</span>
+        <h4 class="font-semibold mb-2">Create an Account</h4>
+        <p class="text-gray-600">Sign up and explore materials for free.</p>
+      </div>
+      <div class="p-6">
+        <span class="inline-block bg-blue-600 text-white rounded-full h-12 w-12 flex items-center justify-center text-lg mb-4">2</span>
+        <h4 class="font-semibold mb-2">Learn & Engage</h4>
+        <p class="text-gray-600">Watch videos, read content, and practice.</p>
+      </div>
+      <div class="p-6">
+        <span class="inline-block bg-blue-600 text-white rounded-full h-12 w-12 flex items-center justify-center text-lg mb-4">3</span>
+        <h4 class="font-semibold mb-2">Track Progress</h4>
+        <p class="text-gray-600">Resume where you left off anytime.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- About -->
+<section id="about" class="py-20 bg-white">
+  <div class="max-w-4xl mx-auto px-6 flex flex-col md:flex-row items-center gap-8">
+    <div class="md:w-1/2 text-center md:text-left">
+      <h2 class="text-3xl font-bold mb-4">About AutoEdu</h2>
+      <p class="text-gray-600 mb-3">Created by A’an Dwi Handika Ramadhan, a vocational automotive technology education graduate from Samarinda (born Oct 26, 2002).</p>
+      <p class="text-gray-600">Built with passion to support teachers and students in their learning journey.</p>
+    </div>
+    <div class="md:w-1/2 flex justify-center">
+      <img src="{{ url_for('static', filename='image/aan.jpeg') }}" alt="Profile Photo" class="w-48 h-48 rounded-full object-cover shadow-lg">
+    </div>
+  </div>
+</section>
+{% endblock %}

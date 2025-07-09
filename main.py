@@ -37,12 +37,16 @@ user_collection = db["users"]
 # In-memory database dummy
 materi_list = []
 
+# @app.route('/')
+# def index():
+#     if 'username' not in session:
+#         return redirect(url_for('login'))
+#     materi_list = list(materi_collection.find({}, {"_id": 0}))  # Ambil semua materi
+#     return render_template('dashboard.html', materi_list=materi_list)
+
 @app.route('/')
 def index():
-    if 'username' not in session:
-        return redirect(url_for('login'))
-    materi_list = list(materi_collection.find({}, {"_id": 0}))  # Ambil semua materi
-    return render_template('dashboard.html', materi_list=materi_list)
+    return render_template('landing_page.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -65,7 +69,7 @@ def login():
 def logout():
     session.pop('username', None)
     flash('Berhasil logout!', 'success')
-    return redirect(url_for('login'))
+    return redirect(url_for('index'))
 
 @app.route('/materi/<int:materi_id>')
 def materi_detail(materi_id):

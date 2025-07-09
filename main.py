@@ -25,7 +25,6 @@ def allowed_file(filename):
 # Koneksi MongoDB
 
 dsn = f"{os.getenv('MONGO_PUBLIC_URL')}?authSource=admin"
-print(dsn)
 if dsn == None:
     raise Exception("MONGO_PUBLIC_URL not found in .env file")
 
@@ -330,6 +329,51 @@ def tentang_saya():
 
     user = session['username']  # Pastikan ini sudah tersimpan saat login
     return render_template('tentang_saya.html', user=user)
+
+@app.route('/delete/<materi_id>', methods=['POST'])
+def delete_materi(materi_id):
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    materi = materi_collection.find_one({"id": materi_id}, {"_id": 0})
+    if not materi:
+        flash('Materi tidak ditemukan.', 'error')
+        return redirect(url_for('dashboard'))
+
+    materi_collection.delete_one({"id": materi_id})
+    flash('Materi berhasil dihapus.', 'success')
+    return redirect(url_for('dashboard'))
+
+@app.route('/edit/<materi_id>', methods=['GET'])
+def edit_materi(materi_id):
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    materi = materi_collection.find_one({"id": materi_id}, {"_id": 0})
+    if not materi:
+        flash('Materi tidak ditemukan.', 'error')
+        return redirect(url_for('dashboard'))
+
+    return render_template('edit_materi.html', materi=materi)
+
+
+@app.route('/edit/<materi_id>', methods=['POST'])
+def update_materi(materi_id):
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    judul = request.form.get('judul')
+    deskripsi = request.form.get('deskripsi')
+
+    materi_collection.update_one(
+        {'_id': ObjectId(materi_id)},
+        {'$set': {'judul': judul, 'deskripsi': deskripsi}}
+    )
+
+    flash('Materi berhasil diperbarui.', 'success')
+    return redirect(url_for('dashboard'))
+
+
 
 
 if __name__ == "__main__" :

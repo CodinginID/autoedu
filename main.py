@@ -5,6 +5,7 @@ from werkzeug.utils import secure_filename
 from pymongo import MongoClient
 from datastore import mongo_crud
 from dotenv import load_dotenv
+from datetime import datetime
 import os
 
 load_dotenv()
@@ -33,6 +34,8 @@ client = MongoClient(dsn)
 db = client["tkr"]
 materi_collection = db["materi"]
 user_collection = db["users"]
+nilai_collection = db["nilai"]
+esai_collection = db["esai"]
 
 # In-memory database dummy
 materi_list = []
@@ -334,6 +337,172 @@ def tentang_saya():
 
     user = session['username']  # Pastikan ini sudah tersimpan saat login
     return render_template('tentang_saya.html', user=user)
+
+
+# latihan soal
+
+soal_pg = [
+    {
+        "soal": "Fungsi utama sistem starter pada kendaraan adalah...",
+        "opsi": {
+            "A": "Mengatur pengisian baterai",
+            "B": "Memutar poros engkol untuk menghidupkan mesin",
+            "C": "Menyediakan bahan bakar ke ruang bakar",
+            "D": "Menghidupkan sistem pengapian",
+        },
+        "jawaban": "B"
+    },
+    {
+        "soal": "Komponen utama dalam sistem starter yang berfungsi mengubah energi listrik menjadi energi mekanik adalah...",
+        "opsi": {
+            "A": "Alternator",
+            "B": "Motor starter",
+            "C": "Ignition coil",
+            "D": "Flywheel",
+        },
+        "jawaban": "B"
+    },
+    {
+        "soal": "Berikut ini yang termasuk komponen sistem starter adalah, kecuali...",
+        "opsi": {
+            "A": "Solenoid",
+            "B": "Motor starter",
+            "C": "Aki",
+            "D": "Karburator",
+        },
+        "jawaban": "D"
+    },
+    {
+        "soal": "Komponen yang menghubungkan putaran motor starter ke flywheel adalah...",
+        "opsi": {
+            "A": "Bendix (pinion gear)",
+            "B": "Komutator",
+            "C": "Rotor",
+            "D": "Saklar starter",
+        },
+        "jawaban": "A"
+    },
+    {
+        "soal": "Baterai (aki) dalam sistem starter berfungsi sebagai...",
+        "opsi": {
+            "A": "Pembangkit arus AC",
+            "B": "Sumber energi panas",
+            "C": "Penyedia arus listrik DC",
+            "D": "Pengontrol waktu pengapian",
+        },
+        "jawaban": "C"
+    },
+    {
+        "soal": "Mengapa solenoid penting dalam sistem starter?",
+        "opsi": {
+            "A": "Mengatur arah arus pada sistem kelistrikan",
+            "B": "Mendorong pinion gear dan menyalurkan arus listrik ke motor starter",
+            "C": "Mengisi ulang baterai saat mesin hidup",
+            "D": "Menghentikan kerja sistem starter saat mesin mati",
+        },
+        "jawaban": "B"
+    },
+    {
+        "soal": "Apabila saat distarter hanya terdengar bunyi ‘klik’, kemungkinan besar kerusakan terdapat pada...",
+        "opsi": {
+            "A": "Flywheel",
+            "B": "Relay lampu",
+            "C": "Solenoid starter",
+            "D": "Karburator",
+        },
+        "jawaban": "C"
+    },
+    {
+        "soal": "Pada sistem starter tipe konvensional, arus listrik mengalir pertama kali ke...",
+        "opsi": {
+            "A": "Komutator",
+            "B": "Ignition coil",
+            "C": "Saklar starter",
+            "D": "Busi",
+        },
+        "jawaban": "C"
+    },
+    {
+        "soal": "Jika pinion gear tidak kembali setelah mesin hidup, maka...",
+        "opsi": {
+            "A": "Mesin menjadi lebih cepat hidup",
+            "B": "Motor starter bisa rusak terbakar",
+            "C": "Busi menjadi mati",
+            "D": "Arus listrik menjadi stabil",
+        },
+        "jawaban": "B"
+    },
+    {
+        "soal": "Berikut ini adalah cara merawat sistem starter, kecuali...",
+        "opsi": {
+            "A": "Memastikan kabel tidak longgar",
+            "B": "Membersihkan kutub aki",
+            "C": "Menambah air radiator",
+            "D": "Memeriksa kondisi solenoid",
+        },
+        "jawaban": "C"
+    }
+]
+
+
+@app.route("/quiz/pilihan-ganda", methods=["GET", "POST"])
+def quiz_pg():
+    if request.method == "POST":
+        skor = 0
+        for idx, soal in enumerate(soal_pg):
+            jawaban_user = request.form.get(f"soal_{idx}")
+            if jawaban_user == soal["jawaban"]:
+                skor += 1
+        return render_template("quiz_pg_result.html", skor=skor, total=len(soal_pg))
+
+    return render_template("quiz_pg.html", soal_list=soal_pg)
+
+@app.route("/nilai", methods=["GET", "POST"])
+def daftar_nilai():
+    username = session.get("username")
+    if request.method == "POST":
+        skor = int(request.form.get("skor"))
+        total = int(request.form.get("total"))
+        persentase = (skor / total) * 100
+        nilai_collection.insert_one({
+            "username": username,
+            "skor": skor,
+            "total": total,
+            "persentase": persentase,
+            "tanggal": datetime.now()
+        })
+        return redirect(url_for("daftar_nilai"))
+
+    hasil = list(nilai_collection.find({"username": username}).sort("tanggal", -1))
+    return render_template("daftar_nilai.html", hasil=hasil)
+
+
+@app.route("/quiz/esai", methods=["GET", "POST"])
+def latihan_esai():
+    soal_esai = [
+        "Jelaskan fungsi utama sistem starter pada kendaraan bermotor!",
+        "Sebutkan dan jelaskan fungsi minimal 3 komponen utama dalam sistem starter!",
+        "Apa yang terjadi jika solenoid starter rusak? Jelaskan gejala yang muncul dan pengaruhnya terhadap sistem starter!",
+        "Bagaimana prosedur pemeriksaan sederhana untuk mengetahui apakah sistem starter masih berfungsi dengan baik?",
+        "Gambarkan alur kerja sistem starter saat kunci kontak diputar ke posisi START, dan jelaskan prosesnya secara berurutan!"
+    ]
+    
+    if request.method == "POST":
+        jawaban_user = []
+        for i in range(len(soal_esai)):
+            jawaban_user.append(request.form.get(f"jawaban_{i}"))
+
+        # Di sini bisa simpan ke MongoDB jika perlu
+        esai_collection.insert_one({
+            "username": session.get("username"),
+            "jawaban": jawaban_user,
+            "tanggal": datetime.now()
+        })
+
+        flash("Jawaban berhasil dikirim. Terima kasih!", "success")
+        return redirect(url_for("dashboard"))
+
+    return render_template("latihan_esai.html", soal_list=soal_esai)
 
 
 if __name__ == "__main__" :

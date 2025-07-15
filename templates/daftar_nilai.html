@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="flex justify-between items-center mb-6">
+  <h2 class="text-2xl font-bold text-gray-800">Score History</h2>
+  <input type="text" id="search" placeholder="Search..." class="border px-4 py-2 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+</div>
+
+<div class="overflow-x-auto bg-white shadow rounded-lg">
+  <table class="min-w-full divide-y divide-gray-200 text-sm" id="scoreTable">
+    <thead class="bg-gray-100 text-gray-700 text-left">
+      <tr>
+        <th class="px-6 py-3 font-semibold">Date</th>
+        <th class="px-6 py-3 font-semibold">Username</th>
+        <th class="px-6 py-3 font-semibold">Quiz Type</th>
+        <th class="px-6 py-3 font-semibold">Correct</th>
+        <th class="px-6 py-3 font-semibold">Total</th>
+        <th class="px-6 py-3 font-semibold">Percentage</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-gray-100 text-gray-700">
+      {% for item in hasil %}
+      <tr class="hover:bg-gray-50">
+        <td class="px-6 py-3 whitespace-nowrap">{{ item.tanggal.strftime('%d-%m-%Y %H:%M') }}</td>
+        <td class="px-6 py-3">{{ item.username }}</td>
+        <td class="px-6 py-3">Multiple Choice</td>
+        <td class="px-6 py-3">{{ item.skor }}</td>
+        <td class="px-6 py-3">{{ item.total }}</td>
+        <td class="px-6 py-3">{{ '%.2f' % item.persentase }}%</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<script>
+  const search = document.getElementById("search");
+  const rows = document.querySelectorAll("#scoreTable tbody tr");
+
+  search.addEventListener("input", function () {
+    const keyword = this.value.toLowerCase();
+    rows.forEach(row => {
+      const match = row.innerText.toLowerCase().includes(keyword);
+      row.style.display = match ? "" : "none";
+    });
+  });
+</script>
+
+{% endblock %}

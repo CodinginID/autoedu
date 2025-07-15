@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2 class="text-2xl font-bold text-gray-800 mb-6">Multiple Choice Practice Questions</h2>
+
+<form method="POST" class="space-y-6">
+  {% for soal in soal_list %}
+  {% set soal_index = loop.index0 %}
+  <div class="bg-white p-4 rounded shadow">
+    <p class="font-medium text-gray-800 mb-2">{{ loop.index }}. {{ soal.soal }}</p>
+    <div class="space-y-1">
+      {% for key, val in soal.opsi.items() %}
+      <label class="flex items-center gap-2">
+        <input type="radio" name="soal_{{ soal_index }}" value="{{ key }}" required>
+        <span>{{ key }}. {{ val }}</span>
+      </label>
+      {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+
+  <button type="submit" class="mt-4 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">Submit</button>
+</form>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="bg-white p-6 rounded shadow text-center max-w-xl mx-auto mt-10">
+  <h2 class="text-2xl font-bold text-gray-800 mb-4">Hasil Latihan</h2>
+  <p class="text-lg text-gray-700">Skor Anda: <strong>{{ skor }}/{{ total }}</strong></p>
+
+  <div class="mt-6 flex justify-center gap-4">
+    <form action="{{ url_for('daftar_nilai') }}" method="POST">
+      <input type="hidden" name="skor" value="{{ skor }}">
+      <input type="hidden" name="total" value="{{ total }}">
+      <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+        Save Score
+      </button>
+    </form>
+    <a href="/quiz/pilihan-ganda" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+      Coba Lagi
+    </a>
+  </div>
+</div>
+{% endblock %}

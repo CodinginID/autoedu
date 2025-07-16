@@ -498,9 +498,22 @@ def daftar_nilai():
         return redirect(url_for("daftar_nilai"))
 
     # hasil = list(nilai_collection.find({"username": user_info["username"]}).sort("tanggal", -1)) # using parameter filter username
-    hasil = list(nilai_collection.find().sort("tanggal", -1)) #display all data
+    page = int(request.args.get("page", 1))
+    per_page = 10
+    skip = (page - 1) * per_page
 
-    return render_template("daftar_nilai.html", hasil=hasil)
+    total = nilai_collection.count_documents({})
+    hasil = list(nilai_collection.find({}).sort("tanggal", -1).skip(skip).limit(per_page))
+    total_pages = (total + per_page - 1) // per_page
+
+    # Untuk range pagination dinamis
+    range_size = 5  # tampilkan 5 page max
+    start_page = max(1, page - range_size // 2)
+    end_page = min(start_page + range_size - 1, total_pages)
+    start_page = max(1, end_page - range_size + 1)  # biar jumlah tetap 5
+
+    pages = range(start_page, end_page + 1)
+    return render_template("daftar_nilai.html", hasil=hasil, page=page, total_pages=total_pages, pages=pages)
 
 
 

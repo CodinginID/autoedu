@@ -26,7 +26,6 @@ def allowed_file(filename):
 # Koneksi MongoDB
 
 dsn = f"{os.getenv('MONGO_PUBLIC_URL')}?authSource=admin"
-print(dsn)
 if dsn == None:
     raise Exception("MONGO_PUBLIC_URL not found in .env file")
 
@@ -39,13 +38,6 @@ esai_collection = db["esai"]
 
 # In-memory database dummy
 materi_list = []
-
-# @app.route('/')
-# def index():
-#     if 'username' not in session:
-#         return redirect(url_for('login'))
-#     materi_list = list(materi_collection.find({}, {"_id": 0}))  # Ambil semua materi
-#     return render_template('dashboard.html', materi_list=materi_list)
 
 @app.route('/')
 def index():
@@ -279,6 +271,15 @@ def tambah_materi():
                             subsub["konten"] = filename
                         else:
                             subsub["konten"] = None
+                    elif tipe_sub == "image":
+                        image = request.files.get(f"submateri[{i}][gambar]")
+                        if image and image.filename:
+                            filename = secure_filename(image.filename)
+                            image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                            sub_data["konten"] = filename
+                        else:
+                            sub_data["konten"] = None
+
 
                     sub_data["konten"].append(subsub)
                     j += 1
@@ -447,34 +448,58 @@ soal_pg = [
 
 @app.route("/quiz/pilihan-ganda", methods=["GET", "POST"])
 def quiz_pg():
+    if "user_info" not in session:
+        return redirect(url_for("data_diri"))
+
     if request.method == "POST":
         skor = 0
         for idx, soal in enumerate(soal_pg):
             jawaban_user = request.form.get(f"soal_{idx}")
             if jawaban_user == soal["jawaban"]:
                 skor += 1
+
+         # simpan skor di session sementara
+        session["last_score"] = {
+            "skor": skor,
+            "total": len(soal_pg),
+            "tipe_soal": "Pilihan Ganda"
+        }
         return render_template("quiz_pg_result.html", skor=skor, total=len(soal_pg))
 
     return render_template("quiz_pg.html", soal_list=soal_pg)
 
 @app.route("/nilai", methods=["GET", "POST"])
 def daftar_nilai():
-    username = session.get("username")
+    user_info = session.get("user_info")
+    if not user_info:
+        return redirect(url_for("data_diri"))
+
     if request.method == "POST":
-        skor = int(request.form.get("skor"))
-        total = int(request.form.get("total"))
-        persentase = (skor / total) * 100
-        nilai_collection.insert_one({
-            "username": username,
-            "skor": skor,
-            "total": total,
-            "persentase": persentase,
-            "tanggal": datetime.now()
-        })
+        try:
+            skor = int(request.form.get("skor"))
+            total = int(request.form.get("total"))
+            persentase = (skor / total) * 100
+            tipe = request.form.get("tipe", "PG")  # default ke PG jika tidak dikirim
+
+            nilai_collection.insert_one({
+                "username": user_info["username"],
+                "class": user_info["kelas"],
+                "major": user_info["jurusan"],
+                "tipe_soal": tipe,
+                "skor": skor,
+                "total": total,
+                "persentase": persentase,
+                "tanggal": datetime.now()
+            })
+            print("✅ Nilai berhasil disimpan ke database.")
+        except Exception as e:
+            print("❌ Gagal menyimpan nilai:", e)
+
         return redirect(url_for("daftar_nilai"))
 
-    hasil = list(nilai_collection.find({"username": username}).sort("tanggal", -1))
+    hasil = list(nilai_collection.find({"username": user_info["username"]}).sort("tanggal", -1))
     return render_template("daftar_nilai.html", hasil=hasil)
+
 
 
 @app.route("/quiz/esai", methods=["GET", "POST"])
@@ -503,6 +528,25 @@ def latihan_esai():
         return redirect(url_for("dashboard"))
 
     return render_template("latihan_esai.html", soal_list=soal_esai)
+
+@app.route("/quiz/data-diri", methods=["GET", "POST"])
+def data_diri():
+    if request.method == "POST":
+        session["user_info"] = {
+            "username": request.form["username"],
+            "kelas": request.form["kelas"],
+            "jurusan": request.form["jurusan"]
+        }
+        return redirect(url_for("quiz_menu"))
+    return render_template("data_diri.html")
+
+
+@app.route("/quiz/menu")
+def quiz_menu():
+    if "user_info" not in session:
+        return redirect(url_for("data_diri"))
+    return render_template("quiz_menu.html")
+
 
 
 if __name__ == "__main__" :

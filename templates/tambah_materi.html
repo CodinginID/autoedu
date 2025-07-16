@@ -65,6 +65,7 @@ function addSubMateri() {
       <select name="submateri[${subMateriIndex}][tipe]" onchange="handleKontenTypeChange(this, ${subMateriIndex})" class="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white">
         <option value="text">Teks</option>
         <option value="video">Video</option>
+        <option value="image">Gambar</option>
         <option value="multi">Sub-submateri</option>
       </select>
     </div>
@@ -95,6 +96,17 @@ function handleKontenTypeChange(select, index) {
           <span class="text-base text-blue-700 font-medium">Unggah Video</span>
         </label>
         <input id="upload-video-${index}" type="file" name="submateri[${index}][video]" accept="video/*" class="sr-only">
+      </div>
+    `;
+    lucide.createIcons();
+  } else if (val === 'image') {
+    wrapper.innerHTML = `
+      <div class="relative w-full">
+        <label for="upload-image-${index}" class="flex items-center justify-center gap-3 border border-dashed border-blue-400 p-4 rounded-lg bg-blue-50 cursor-pointer hover:bg-blue-100 transition duration-150 ease-in-out">
+          <i data-lucide="upload-cloud" class="w-6 h-6 text-blue-500"></i>
+          <span class="text-base text-blue-700 font-medium">Unggah Gambar</span>
+        </label>
+        <input id="upload-image-${index}" type="file" name="submateri[${index}][image]" accept="image/*" class="sr-only">
       </div>
     `;
     lucide.createIcons();

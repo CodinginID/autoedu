@@ -59,9 +59,36 @@
   </aside>
 
   <!-- Main -->
-  <main class="flex-1 p-6 overflow-y-auto">
+  <main class="flex-1 p-6 overflow-y-auto relative">
+    <!-- Background Icon -->
+    <div
+      class="absolute bottom-10 left-1/2 transform -translate-x-1/2 w-[1000px] opacity-10 pointer-events-none select-none">
+      <img src="/static/image/starter-bg.png" alt="Background Icon">
+    </div>
+
     {% block content %}{% endblock %}
   </main>
+
+  <audio id="dashboard-audio" src="{{ url_for('static', filename='audio/dashboard-sound.mp3') }}"></audio>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const audio = document.getElementById("dashboard-audio");
+
+      // Coba mainkan audio (beberapa browser butuh interaksi pengguna lebih dulu)
+      const playSound = () => {
+        audio.volume = 0.4; // Sesuaikan volume
+        audio.play().catch(e => {
+          console.log("Autoplay diblokir oleh browser. Tunggu interaksi user.");
+        });
+      };
+
+      // Jika tidak langsung jalan, aktif saat klik pertama
+      playSound();
+      document.body.addEventListener('click', playSound, { once: true });
+    });
+  </script>
+
 
   <script>lucide.createIcons();</script>
 </body>

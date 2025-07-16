@@ -497,7 +497,9 @@ def daftar_nilai():
 
         return redirect(url_for("daftar_nilai"))
 
-    hasil = list(nilai_collection.find({"username": user_info["username"]}).sort("tanggal", -1))
+    # hasil = list(nilai_collection.find({"username": user_info["username"]}).sort("tanggal", -1)) # using parameter filter username
+    hasil = list(nilai_collection.find().sort("tanggal", -1)) #display all data
+
     return render_template("daftar_nilai.html", hasil=hasil)
 
 

@@ -4,8 +4,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from pymongo import MongoClient
 from datastore import mongo_crud
+from bson.objectid import ObjectId
 from dotenv import load_dotenv
 from datetime import datetime
+from werkzeug.utils import secure_filename
 import os
 
 load_dotenv()
@@ -297,30 +299,94 @@ def tambah_materi():
 
         return redirect(url_for('dashboard'))
 
-# @app.route('/materi/tambah', methods=['GET', 'POST'])
-# def tambah_materi():
-#     if 'username' not in session:
-#         return redirect(url_for('login'))
+# parsing form data
+def parse_form_data(request):
+    data = {
+        "judul": request.form.get("judul"),
+        "deskripsi": request.form.get("deskripsi"),
+        "sub_materi": []
+    }
 
-#     if request.method == 'POST':
-#         judul = request.form['judul']
-#         deskripsi = request.form['deskripsi']
-#         icon_url = request.form['icon_url']
+    submateri = {}
 
-#         # Ambil ID terakhir, lalu tambah 1
-#         last = materi_collection.find_one(sort=[("id", -1)])
-#         new_id = (last['id'] + 1) if last else 1
+    for key in request.form:
+        if key.startswith("submateri["):
+            # Misal: submateri[0][judul]
+            parts = key.split('[')
+            i = int(parts[1][:-1])  # ambil index i
+            field = parts[2][:-1]   # ambil field misal 'judul' atau 'tipe'
 
-#         materi_collection.insert_one({
-#             "id": new_id,
-#             "judul": judul,
-#             "deskripsi": deskripsi,
-#             "icon_url": icon_url
-#         })
+            sub = submateri.setdefault(i, {})
+            sub[field] = request.form.get(key)
 
-#         return redirect(url_for('dashboard'))
+    for key in request.files:
+        if key.startswith("submateri["):
+            parts = key.split('[')
+            i = int(parts[1][:-1])
+            field = parts[2][:-1]
 
-#     return render_template("tambah_materi.html")
+            file = request.files[key]
+            if file.filename:
+                filename = secure_filename(file.filename)
+                filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                file.save(filepath)
+
+                sub = submateri.setdefault(i, {})
+                sub['konten'] = filepath
+            elif f"submateri[{i}][existing]" in request.form:
+                # keep existing file
+                sub = submateri.setdefault(i, {})
+                sub['konten'] = request.form.get(f"submateri[{i}][existing]")
+
+    # Handle sub-sub materi (multi)
+    for i, sub in submateri.items():
+        if sub.get('tipe') == 'multi':
+            sub['konten'] = []
+            j = 0
+            while True:
+                prefix = f"submateri[{i}][subs][{j}]"
+                if f"{prefix}[judul]" not in request.form:
+                    break
+
+                subsub = {
+                    "judul": request.form.get(f"{prefix}[judul]"),
+                    "tipe": request.form.get(f"{prefix}[tipe]"),
+                }
+
+                if subsub["tipe"] == "text":
+                    subsub["konten"] = request.form.get(f"{prefix}[konten]")
+                else:
+                    file = request.files.get(f"{prefix}[konten]")
+                    if file and file.filename:
+                        filename = secure_filename(file.filename)
+                        filepath = os.path.join("static/uploads", filename)
+                        file.save(filepath)
+                        subsub["konten"] = filepath
+                    elif f"{prefix}[existing]" in request.form:
+                        subsub["konten"] = request.form.get(f"{prefix}[existing]")
+
+                sub['konten'].append(subsub)
+                j += 1
+
+    data["sub_materi"] = [submateri[i] for i in sorted(submateri.keys())]
+    return data
+
+@app.route('/edit_materi/<int:materi_id>', methods=['GET', 'POST'])
+def edit_materi(materi_id):
+    try:
+        materi = db.materi.find_one({'id': materi_id})
+    except:
+        flash("materi tidak ditemukan")
+
+    if request.method == 'POST':
+        data = parse_form_data(request)
+
+        db.materi.update_one({'id': materi_id}, {'$set': data})
+        flash('Materi berhasil diperbarui!', 'success')
+        return redirect(url_for('dashboard'))
+
+    return render_template("edit_materi.html", form_action=url_for('edit_materi', materi_id=materi_id), materi=materi)
+
 
 
 def save_file(file):

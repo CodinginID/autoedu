@@ -1,0 +1,72 @@
+<form method="POST" enctype="multipart/form-data" action="{{ form_action }}" class="space-y-6">
+  <div class="mb-6">
+    <label class="block font-semibold mb-1">Judul Materi</label>
+    <input type="text" name="judul" value="{{ materi.judul if materi else '' }}" class="w-full px-4 py-2 border rounded-md">
+  </div>
+
+  <div class="mb-6">
+    <label class="block font-semibold mb-1">Deskripsi</label>
+    <textarea name="deskripsi" class="w-full px-4 py-2 border rounded-md">{{ materi.deskripsi if materi else '' }}</textarea>
+  </div>
+
+  {# Sub Materi #}
+  <div class="space-y-6">
+    {% for sub in materi.sub_materi or [] %}
+      {% set i = loop.index0 %}
+      <div class="p-4 border rounded-lg bg-white shadow-sm">
+        <label class="block font-semibold mb-2">Judul Sub Materi</label>
+        <input type="text" name="submateri[{{ i }}][judul]" value="{{ sub.judul }}" class="w-full px-3 py-2 border rounded-md">
+
+        <label class="block font-semibold mt-4 mb-2">Tipe</label>
+        <select name="submateri[{{ i }}][tipe]" class="w-full px-3 py-2 border rounded-md">
+          <option value="text" {% if sub.tipe == 'text' %}selected{% endif %}>Text</option>
+          <option value="video" {% if sub.tipe == 'video' %}selected{% endif %}>Video</option>
+          <option value="multi" {% if sub.tipe == 'multi' %}selected{% endif %}>Multi</option>
+        </select>
+
+        {% if sub.tipe == 'text' %}
+          <label class="block mt-4 mb-1">Konten</label>
+          <textarea name="submateri[{{ i }}][konten]" class="w-full px-3 py-2 border rounded-md">{{ sub.konten }}</textarea>
+
+        {% elif sub.tipe == 'video' %}
+          <p class="text-sm text-gray-600 mt-4">Current: {{ sub.konten }}</p>
+          <input type="hidden" name="submateri[{{ i }}][existing]" value="{{ sub.konten }}">
+          <input type="file" name="submateri[{{ i }}][video]" class="w-full px-3 py-2 border rounded-md">
+
+        {% elif sub.tipe == 'multi' %}
+          {% for subsub in sub.konten %}
+            {% set j = loop.index0 %}
+            <div class="mt-4 p-3 border rounded bg-gray-50">
+              <input type="text" name="submateri[{{ i }}][subs][{{ j }}][judul]" value="{{ subsub.judul }}" placeholder="Judul" class="w-full px-3 py-2 border rounded-md mt-2">
+
+              <select name="submateri[{{ i }}][subs][{{ j }}][tipe]" class="w-full px-3 py-2 border rounded-md mt-2">
+                <option value="text" {% if subsub.tipe == 'text' %}selected{% endif %}>Text</option>
+                <option value="image" {% if subsub.tipe == 'image' %}selected{% endif %}>Image</option>
+              </select>
+
+              {% if subsub.tipe == 'text' %}
+                <textarea name="submateri[{{ i }}][subs][{{ j }}][konten]" class="w-full px-3 py-2 border rounded-md mt-2">{{ subsub.konten }}</textarea>
+              {% elif subsub.tipe in ['image', 'video'] %}
+                <p class="text-sm text-gray-600 mt-2">Current: {{ subsub.konten }}</p>
+                <input type="hidden" name="submateri[{{ i }}][subs][{{ j }}][existing]" value="{{ subsub.konten }}">
+                <input type="file" name="submateri[{{ i }}][subs][{{ j }}][konten]" class="w-full px-3 py-2 border rounded-md mt-2">
+              {% endif %}
+            </div>
+          {% endfor %}
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="pt-4">
+    <button
+      type="submit"
+      class="flex items-center gap-2 px-6 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow hover:from-blue-600 hover:to-indigo-600 transition"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" stroke="currentColor" fill="none">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7" />
+      </svg>
+      <span class="font-medium">Save Changes</span>
+    </button>
+  </div>
+</form>

@@ -332,7 +332,7 @@ def parse_form_data(request):
                 file.save(filepath)
 
                 sub = submateri.setdefault(i, {})
-                sub['konten'] = filepath
+                sub['konten'] = filename
             elif f"submateri[{i}][existing]" in request.form:
                 # keep existing file
                 sub = submateri.setdefault(i, {})
@@ -359,9 +359,9 @@ def parse_form_data(request):
                     file = request.files.get(f"{prefix}[konten]")
                     if file and file.filename:
                         filename = secure_filename(file.filename)
-                        filepath = os.path.join("static/uploads", filename)
+                        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                         file.save(filepath)
-                        subsub["konten"] = filepath
+                        subsub["konten"] = filename
                     elif f"{prefix}[existing]" in request.form:
                         subsub["konten"] = request.form.get(f"{prefix}[existing]")
 
